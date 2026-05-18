@@ -275,6 +275,14 @@
             justify-content: center;
             font-size: 2rem;
             position: relative;
+            overflow: hidden;
+        }
+
+        .bot-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--radius-lg);
         }
 
         .bot-avatar::after {
@@ -663,7 +671,21 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--text-muted);
         }
+
+        /* ===== LOADING SKELETON ===== */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-hover) 25%, var(--bg-card) 50%, var(--bg-hover) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
     </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -713,7 +735,10 @@
             <div class="glow-orb-2"></div>
             <div class="bot-card">
                 <div class="bot-card-header">
-                    <div class="bot-avatar">🐱</div>
+                    <div class="bot-avatar">
+                        <!-- 고양이 프로필 이미지 - 아래 src를 실제 이미지 URL로 교체 -->
+                        <img src="avatar.png" alt="무냐" id="bot-avatar-img" onerror="this.style.display='none'; this.parentElement.innerHTML='🐱';">
+                    </div>
                     <div class="bot-card-info">
                         <h3>무냐</h3>
                         <span>디스코드 봇</span>
@@ -834,76 +859,122 @@
     </footer>
 
     <script>
-        // ===== 봇 상태 설정 (수정 가능) =====
-        const BOT_STATUS = {
-            online: true,        // true = 온라인(초록색), false = 오프라인(회색)
-            servers: 12,         // 서버 수 (수동 입력)
-            users: 340,          // 유저 수 (수동 입력)
-            uptime: "99.9%"      // 가동률
+        // ============================================================
+        // 설정 영역 - 여기만 수정하면 됨
+        // ============================================================
+
+        // GitHub 유저명과 레포명 (stats.json 파일 경로)
+        const GITHUB_USER = "munang77";  // ← GitHub 유저명으로 수정
+        const GITHUB_REPO = "munya-bot";  // ← 레포명으로 수정
+
+        // 봇 아바타 이미지 URL (GitHub 레포에 올린 이미지 URL 또는 외부 URL)
+        // 예시: "https://raw.githubusercontent.com/munang77/munya-bot/main/avatar.png"
+        const BOT_AVATAR_URL = "avatar.png";  // ← 실제 이미지 URL로 수정
+
+        // 기본값 (stats.json 로드 실패 시 사용)
+        const DEFAULT_STATS = {
+            online: true,
+            servers: 12,
+            users: 340,
+            uptime: "99.9%"
         };
 
-        // 상태 적용
-        const statusDot = document.querySelector('.status-dot');
-        const statusText = document.getElementById('bot-status-text');
-        const serverCount = document.getElementById('server-count');
-        const userCount = document.getElementById('user-count');
-        const uptimeEl = document.getElementById('uptime');
+        // ============================================================
+        // 실시간 stats.json 로드
+        // ============================================================
 
-        if (!BOT_STATUS.online) {
-            statusDot.style.background = '#747f8d';
-            statusDot.style.boxShadow = 'none';
-            statusDot.style.animation = 'none';
-            statusText.textContent = '현재 점검 중';
+        async function fetchStats() {
+            try {
+                // 캐시 방지용 타임스탬프 추가
+                const timestamp = Date.now();
+                const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/stats.json?t=${timestamp}`;
+
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("Stats 파일 없음");
+
+                const data = await res.json();
+
+                // 실시간 값으로 업데이트
+                updateUI(data);
+
+                console.log("✅ Stats 로드 완료:", data);
+            } catch (e) {
+                console.log("⚠️ Stats 로드 실패, 기본값 사용:", e.message);
+                updateUI(DEFAULT_STATS);
+            }
         }
 
-        serverCount.textContent = BOT_STATUS.servers + '+';
-        userCount.textContent = BOT_STATUS.users + '+';
-        uptimeEl.textContent = BOT_STATUS.uptime;
+        function updateUI(data) {
+            // 서버 수
+            const serverEl = document.getElementById("server-count");
+            if (data.servers !== undefined) {
+                serverEl.textContent = data.servers + "+";
+            }
 
-        // ===== 숫자 카운트 애니메이션 =====
-        function animateValue(element, start, end, duration) {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                element.textContent = Math.floor(progress * (end - start) + start) + '+';
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
+            // 유저 수
+            const userEl = document.getElementById("user-count");
+            if (data.users !== undefined) {
+                userEl.textContent = data.users + "+";
+            }
+
+            // 가동률
+            const uptimeEl = document.getElementById("uptime");
+            if (data.uptime !== undefined) {
+                uptimeEl.textContent = data.uptime;
+            }
+
+            // 상태 표시
+            const statusText = document.getElementById("bot-status-text");
+            const statusDot = document.querySelector(".status-dot");
+
+            if (data.online === false) {
+                statusText.textContent = "현재 점검 중";
+                statusDot.style.background = "#747f8d";
+                statusDot.style.boxShadow = "none";
+                statusDot.style.animation = "none";
+            } else {
+                statusText.textContent = "서버 운영 중";
+                statusDot.style.background = "#3ba55d";
+                statusDot.style.boxShadow = "0 0 8px rgba(59, 165, 93, 0.3)";
+                statusDot.style.animation = "pulse 2s infinite";
+            }
         }
 
-        // Intersection Observer로 화면에 보일 때 카운트
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    animateValue(serverCount, 0, BOT_STATUS.servers, 1500);
-                    animateValue(userCount, 0, BOT_STATUS.users, 1500);
-                    observer.disconnect();
-                }
-            });
-        }, { threshold: 0.5 });
+        // 아바타 이미지 설정
+        function setAvatar() {
+            const img = document.getElementById("bot-avatar-img");
+            if (BOT_AVATAR_URL && BOT_AVATAR_URL !== "avatar.png") {
+                img.src = BOT_AVATAR_URL;
+            }
+        }
 
-        observer.observe(document.querySelector('.bot-stats'));
+        // 페이지 로드 시 실행
+        setAvatar();
+        fetchStats();
 
-        // ===== 네비게이션 활성화 =====
-        const sections = document.querySelectorAll('section[id]');
-        const navLinks = document.querySelectorAll('.nav-links a');
+        // 30초마다 갱신
+        setInterval(fetchStats, 30000);
 
-        window.addEventListener('scroll', () => {
-            let current = '';
+        // ============================================================
+        // 네비게이션 활성화
+        // ============================================================
+
+        const sections = document.querySelectorAll("section[id]");
+        const navLinks = document.querySelectorAll(".nav-links a");
+
+        window.addEventListener("scroll", () => {
+            let current = "";
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
                 if (scrollY >= sectionTop - 200) {
-                    current = section.getAttribute('id');
+                    current = section.getAttribute("id");
                 }
             });
 
             navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === '#' + current) {
-                    link.classList.add('active');
+                link.classList.remove("active");
+                if (link.getAttribute("href") === "#" + current) {
+                    link.classList.add("active");
                 }
             });
         });
