@@ -95,7 +95,7 @@ nav {
 .server-name { font-size:0.9rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 /* ── 컨텐츠 ── */
-.content { margin-left:260px; flex:1; padding:32px 40px; max-width:1000px; }
+.content { margin-left:0; flex:1; padding:32px 40px; max-width:1000px; }
 
 /* ── 페이지들 ── */
 .page { display:none; }
@@ -477,9 +477,13 @@ async function init() {
 }
 
 function showPage(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id).style.display = id === "login-page" ? "flex" : "block";
-  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".page").forEach(p => {
+    p.style.display = "none";
+    p.classList.remove("active");
+  });
+  const el = document.getElementById(id);
+  el.style.display = id === "login-page" ? "flex" : "block";
+  el.classList.add("active");
 }
 
 function showDashboard(data) {
