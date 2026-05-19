@@ -589,9 +589,11 @@ function renderGuild(data) {
 
   // 채널 셀렉트 채우기
   const chOptions = `<option value="">없음</option>` + data.text_channels.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
-  ["ch-welcome", "ch-log", "ch-notify", "ticket-log", "tp-channel"].forEach(id => {
+  const tpOptions = `<option value="">채널 선택</option>` + data.text_channels.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+  ["ch-welcome", "ch-log", "ch-notify", "ticket-log"].forEach(id => {
     document.getElementById(id).innerHTML = chOptions;
   });
+  document.getElementById("tp-channel").innerHTML = tpOptions;
   document.getElementById("ch-welcome").value = data.channels.welcome || "";
   document.getElementById("ch-log").value = data.channels.log || "";
   document.getElementById("ch-notify").value = data.channels.notify || "";
