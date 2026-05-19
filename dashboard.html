@@ -426,6 +426,30 @@ nav {
           </div>
         </div>
 
+        <!-- 티켓 패널 전송 -->
+        <div class="settings-card">
+          <div class="card-title"><span class="card-icon">📨</span>티켓 패널 전송</div>
+          <div class="input-group">
+            <label class="input-label">전송할 채널</label>
+            <select class="select-field" id="tp-channel">
+              <option value="">채널 선택</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label">패널 제목</label>
+            <input type="text" class="input-field" id="tp-title" placeholder="티켓 문의" value="티켓 문의">
+          </div>
+          <div class="input-group">
+            <label class="input-label">패널 내용</label>
+            <input type="text" class="input-field" id="tp-description" placeholder="아래 버튼을 눌러 티켓을 열어주세요." value="아래 버튼을 눌러 티켓을 열어주세요.">
+          </div>
+          <div class="input-group">
+            <label class="input-label">버튼 이름</label>
+            <input type="text" class="input-field" id="tp-button" placeholder="티켓 열기" value="티켓 열기">
+          </div>
+          <button class="btn-add" style="width:100%;margin-top:4px" onclick="sendTicketPanel()">패널 전송하기</button>
+        </div>
+
         <!-- 금지어 -->
         <div class="settings-card">
           <div class="card-title"><span class="card-icon">🚫</span>금지어 목록</div>
@@ -565,7 +589,7 @@ function renderGuild(data) {
 
   // 채널 셀렉트 채우기
   const chOptions = `<option value="">없음</option>` + data.text_channels.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
-  ["ch-welcome", "ch-log", "ch-notify", "ticket-log"].forEach(id => {
+  ["ch-welcome", "ch-log", "ch-notify", "ticket-log", "tp-channel"].forEach(id => {
     document.getElementById(id).innerHTML = chOptions;
   });
   document.getElementById("ch-welcome").value = data.channels.welcome || "";
@@ -665,6 +689,27 @@ async function saveSettings() {
     btn.textContent = "설정 저장";
     btn.disabled = false;
   }
+}
+
+async function sendTicketPanel() {
+  const channel_id = document.getElementById("tp-channel").value;
+  if (!channel_id) { showToast("채널을 선택해주세요!", "error"); return; }
+  try {
+    const res = await fetch(`${API}/api/guild/${currentGuildId}/ticket-panel`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        channel_id,
+        title: document.getElementById("tp-title").value || "티켓 문의",
+        description: document.getElementById("tp-description").value || "아래 버튼을 눌러 티켓을 열어주세요.",
+        button_label: document.getElementById("tp-button").value || "티켓 열기",
+      }),
+    });
+    const data = await res.json();
+    if (data.success) showToast("티켓 패널 전송 완료!", "success");
+    else showToast("실패: " + data.error, "error");
+  } catch(e) { showToast("오류: " + e.message, "error"); }
 }
 
 function login() {
