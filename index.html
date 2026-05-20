@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>무냐 — 한국어 디스코드 봇</title>
+<script>
+// 인증 토큰 없으면 verify 페이지로
+if (!sessionStorage.getItem('munya_pass')) {
+  window.location.replace('verify.html');
+}
+</script>
 <meta name="description" content="보안부터 관리, 이벤트, 티켓까지. 무냐와 함께 서버를 안전하게.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -447,41 +453,6 @@ footer{
     <div class="cmd-card"><div class="cmd-name">/밥추천</div><div class="cmd-desc">오늘 뭐 먹을지 모를 때 — 랜덤 추천</div></div>
     <div class="cmd-card"><div class="cmd-name">/서버</div><div class="cmd-desc">멤버 수·채널·역할·개설일 등 서버 정보</div></div>
     <div class="cmd-card"><div class="cmd-name">/호감도</div><div class="cmd-desc">무냐와의 호감도 단계 확인</div></div>
-  </div>
-</section>
-
-<!-- REVIEWS -->
-<section id="reviews" style="background:var(--bg2)">
-  <div class="sec-head sec-center">
-    <div class="sec-label">Reviews</div>
-    <h2 class="sec-title">서버 관리자 후기</h2>
-    <p class="sec-sub">무냐를 도입한 서버 관리자들의 실제 후기예요.</p>
-  </div>
-  <div class="review-grid">
-    <div class="review-card">
-      <div class="review-stars">★★★★★</div>
-      <p class="review-text">한국 봇이라 설정이 너무 편해요. 슬래시 명령어로 패널 하나에서 모든 보안 설정을 끝낼 수 있었고, 도배 감지가 생각보다 훨씬 빠르게 작동해서 깜짝 놀랐어요.</p>
-      <div class="review-author">
-        <div class="review-avatar">김</div>
-        <div><div class="review-name">kimserver</div><div class="review-role">서버 관리자</div></div>
-      </div>
-    </div>
-    <div class="review-card">
-      <div class="review-stars">★★★★★</div>
-      <p class="review-text">티켓 시스템이랑 반응 역할 기능이 정말 유용해요. 기존에 여러 봇으로 나눠 쓰던 기능을 무냐 하나로 다 해결했어요. 대시보드도 깔끔해서 좋아요.</p>
-      <div class="review-author">
-        <div class="review-avatar">박</div>
-        <div><div class="review-name">parkgaming</div><div class="review-role">1,200명 서버 운영</div></div>
-      </div>
-    </div>
-    <div class="review-card">
-      <div class="review-stars">★★★★★</div>
-      <p class="review-text">활동량 통계 기능이 서버 운영에 정말 도움이 돼요. 어떤 멤버가 얼마나 활동하는지 한눈에 보여서 이벤트 보상 줄 때 기준이 명확해졌어요.</p>
-      <div class="review-author">
-        <div class="review-avatar">이</div>
-        <div><div class="review-name">lee_discord</div><div class="review-role">커뮤니티 운영자</div></div>
-      </div>
-    </div>
   </div>
 </section>
 
