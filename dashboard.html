@@ -459,6 +459,27 @@ nav {
             <button class="btn-add" onclick="addBadword()">추가</button>
           </div>
         </div>
+
+        <!-- 경고 관리 -->
+        <div class="settings-card">
+          <div class="card-title"><span class="card-icon">⚠️</span>경고 관리</div>
+          <div id="warn-list" style="min-height:60px;margin-bottom:12px;max-height:220px;overflow-y:auto;">
+            <p style="color:var(--sub);font-size:.85rem;">로딩 중...</p>
+          </div>
+          <div class="tag-input-row" style="margin-top:8px">
+            <input type="text" class="input-field" id="warn-uid-input" placeholder="유저 ID 입력">
+            <button class="btn-add" style="background:var(--red);border-color:var(--red)" onclick="clearWarn()">초기화</button>
+          </div>
+        </div>
+
+        <!-- 출석 순위 -->
+        <div class="settings-card">
+          <div class="card-title"><span class="card-icon">📅</span>출석 순위 TOP 10</div>
+          <div id="attend-list" style="min-height:60px;max-height:260px;overflow-y:auto;">
+            <p style="color:var(--sub);font-size:.85rem;">로딩 중...</p>
+          </div>
+        </div>
+
       </div>
 
       <div class="save-bar">
@@ -611,6 +632,62 @@ function renderGuild(data) {
 
   // 금지어
   renderBadwords(data.security.badwords || []);
+  // 경고 목록
+  renderWarns(data.warns || {});
+  // 출석 순위
+  renderAttendance(data.attendance || {});
+}
+
+function renderWarns(warns) {
+  const list = document.getElementById("warn-list");
+  const entries = Object.entries(warns).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) {
+    list.innerHTML = '<p style="color:var(--sub);font-size:.85rem;">경고받은 멤버가 없어요!</p>';
+    return;
+  }
+  list.innerHTML = entries.slice(0, 15).map(([uid, cnt]) =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+      <span style="color:var(--sub);font-size:.85rem;font-family:monospace">${uid}</span>
+      <span style="color:var(--red);font-weight:700">${cnt}회 경고</span>
+    </div>`
+  ).join("");
+}
+
+function renderAttendance(att) {
+  const list = document.getElementById("attend-list");
+  const entries = Object.entries(att).sort((a, b) => b[1].count - a[1].count).slice(0, 10);
+  if (!entries.length) {
+    list.innerHTML = '<p style="color:var(--sub);font-size:.85rem;">출석한 멤버가 없어요!</p>';
+    return;
+  }
+  const medals = ["🥇","🥈","🥉"];
+  list.innerHTML = entries.map(([uid, d], i) =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:.9rem">${medals[i] || (i+1)+"위"} <span style="color:var(--sub);font-size:.8rem;font-family:monospace">${uid}</span></span>
+      <span style="color:var(--accent2);font-size:.85rem"><b>${d.count}일</b> <span style="color:var(--muted)">(연속 ${d.streak}일)</span></span>
+    </div>`
+  ).join("");
+}
+
+async function clearWarn() {
+  const uid = document.getElementById("warn-uid-input").value.trim();
+  if (!uid) { showToast("유저 ID를 입력해주세요!", "error"); return; }
+  if (!currentGuildId) return;
+  try {
+    const res = await fetch(`${API}/api/guild/${currentGuildId}/warn/${uid}/clear`, {
+      method: "POST", credentials: "include"
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    showToast("경고 초기화 완료!", "success");
+    document.getElementById("warn-uid-input").value = "";
+    if (currentGuildData && currentGuildData.warns) {
+      delete currentGuildData.warns[uid];
+      renderWarns(currentGuildData.warns);
+    }
+  } catch(e) {
+    showToast("초기화 실패: " + e.message, "error");
+  }
 }
 
 function renderBadwords(words) {
