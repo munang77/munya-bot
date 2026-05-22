@@ -1,18 +1,49 @@
 {
-  "message_counts": {},
-  "channel_counts": {},
-  "word_counts": {},
-  "voice_time": {},
+  "message_counts": {
+    "1475483386956218438": {
+      "1060777189005606942": 1
+    }
+  },
+  "channel_counts": {
+    "1475483386956218438": {
+      "1475483388147400704": 1
+    }
+  },
+  "word_counts": {
+    "1475483386956218438": 0
+  },
+  "voice_time": {
+    "1475483386956218438": {
+      "1475481904903098430": 1.0032169818878174
+    }
+  },
   "warn_counts": {},
   "welcome_channels": {},
   "notify_channels": {},
   "log_channels": {},
   "verify_channels": {},
   "auto_roles": {},
-  "blacklist": {},
+  "blacklist": {
+    "1475483386956218438": []
+  },
   "reaction_roles": {},
   "custom_responses": {},
-  "security": {},
+  "security": {
+    "1475483386956218438": {
+      "spam": true,
+      "invite": true,
+      "mention": true,
+      "badword": false,
+      "spam_count": 15,
+      "spam_seconds": 3,
+      "warn_limit": 1,
+      "timeout_minutes": 30,
+      "badwords": [],
+      "whitelist_users": [],
+      "whitelist_roles": [],
+      "whitelist_channels": []
+    }
+  },
   "affection": {},
   "attendance": {},
   "start_time": "2026-05-22T12:29:35.103426+00:00",
