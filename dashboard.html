@@ -279,20 +279,36 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
     <!-- 반응역할 -->
     <div id="p-rr" class="panel">
-      <div class="p-title">반응역할 생성</div>
-      <div class="p-desc">이모지를 클릭하면 역할이 지급되는 메시지를 만들어요.</div>
-      <div class="f2">
-        <div class="field"><label>전송할 채널</label><select class="sel" id="rr-ch"><option value="">채널 선택</option></select></div>
-        <div class="field"><label>이모지</label><input type="text" class="inp" id="rr-emoji" placeholder="예: 🎮"></div>
+      <div class="p-title">반응역할 패널 생성</div>
+      <div class="p-desc">이모지 클릭으로 역할을 지급하는 패널을 만들어요. (최대 5개)</div>
+      <div class="field"><label>전송할 채널</label><select class="sel" id="rr-ch"><option value="">채널 선택</option></select></div>
+      <div class="field"><label>패널 제목</label><input type="text" class="inp" id="rr-title" value="역할을 선택해주세요!"></div>
+      <div class="field"><label>패널 내용 (선택)</label><textarea class="inp" id="rr-desc" rows="2" placeholder="예: 원하는 역할의 이모지를 클릭해서 받아가세요." style="resize:vertical;line-height:1.6"></textarea></div>
+      <div class="hr"></div>
+      <div class="p-title" style="margin-bottom:12px;font-size:.85rem">이모지 — 역할 설정</div>
+      <div id="rr-pairs">
+        <div class="rr-pair f2" style="margin-bottom:8px">
+          <div class="field" style="margin:0"><label>이모지 1</label><input type="text" class="inp rr-emoji" placeholder="예: 🎮"></div>
+          <div class="field" style="margin:0"><label>역할 1</label><select class="sel rr-role"><option value="">역할 선택</option></select></div>
+        </div>
+        <div class="rr-pair f2" style="margin-bottom:8px">
+          <div class="field" style="margin:0"><label>이모지 2</label><input type="text" class="inp rr-emoji" placeholder="예: 🎵"></div>
+          <div class="field" style="margin:0"><label>역할 2</label><select class="sel rr-role"><option value="">역할 선택</option></select></div>
+        </div>
+        <div class="rr-pair f2" style="margin-bottom:8px">
+          <div class="field" style="margin:0"><label>이모지 3</label><input type="text" class="inp rr-emoji" placeholder="예: 🎨"></div>
+          <div class="field" style="margin:0"><label>역할 3</label><select class="sel rr-role"><option value="">역할 선택</option></select></div>
+        </div>
+        <div class="rr-pair f2" style="margin-bottom:8px">
+          <div class="field" style="margin:0"><label>이모지 4</label><input type="text" class="inp rr-emoji" placeholder="예: 📚"></div>
+          <div class="field" style="margin:0"><label>역할 4</label><select class="sel rr-role"><option value="">역할 선택</option></select></div>
+        </div>
+        <div class="rr-pair f2" style="margin-bottom:8px">
+          <div class="field" style="margin:0"><label>이모지 5</label><input type="text" class="inp rr-emoji" placeholder="예: 🏆"></div>
+          <div class="field" style="margin:0"><label>역할 5</label><select class="sel rr-role"><option value="">역할 선택</option></select></div>
+        </div>
       </div>
-      <div class="field"><label>지급할 역할</label><select class="sel" id="rr-role"><option value="">역할 선택</option></select></div>
-      <div class="field"><label>메시지 제목</label><input type="text" class="inp" id="rr-title" value="역할을 선택해주세요!"></div>
-      <div class="field"><label>메시지 내용 (선택)</label><textarea class="inp" id="rr-desc" rows="2" placeholder="예: 원하는 역할의 이모지를 클릭해서 받아가세요." style="resize:vertical;line-height:1.6"></textarea></div>
-      <div class="f2">
-        <div class="field"><label>임베드 색상 (hex)</label><input type="text" class="inp" id="rr-color" value="5865F2" placeholder="5865F2"></div>
-        <div class="field"><label>하단 설명 텍스트</label><input type="text" class="inp" id="rr-footer" value="이모지를 클릭하면 역할이 지급돼요!"></div>
-      </div>
-      <button class="btn bp" style="margin-top:4px" onclick="sendReactionRole()">반응역할 생성</button>
+      <button class="btn bp" style="margin-top:8px" onclick="sendReactionRole()">패널 생성하기</button>
     </div>
 
     <!-- 금지어 -->
@@ -451,7 +467,8 @@ function render(d){
   document.getElementById('ticket-cat').value=d.ticket.category_id||'';
   document.getElementById('ticket-role').innerHTML='<option value="">없음</option>'+d.roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
   document.getElementById('ticket-role').value=d.ticket.support_role_id||'';
-  document.getElementById('rr-role').innerHTML='<option value="">역할 선택</option>'+d.roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  const rrRoleOpts='<option value="">역할 선택</option>'+d.roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  document.querySelectorAll('.rr-role').forEach(sel=>sel.innerHTML=rrRoleOpts);
 
   renderBw(d.security.badwords||[]);
   renderWarn(d.warns||{});
@@ -525,23 +542,26 @@ async function sendPanel(){
 
 async function sendReactionRole(){
   const ch=document.getElementById('rr-ch').value;
-  const emoji=document.getElementById('rr-emoji').value.trim();
-  const role=document.getElementById('rr-role').value;
   if(!ch){toast('채널을 선택해주세요','err');return;}
-  if(!emoji){toast('이모지를 입력해주세요','err');return;}
-  if(!role){toast('역할을 선택해주세요','err');return;}
+  // 이모지-역할 쌍 수집
+  const emojis=document.querySelectorAll('.rr-emoji');
+  const roles=document.querySelectorAll('.rr-role');
+  const pairs=[];
+  for(let i=0;i<emojis.length;i++){
+    const e=emojis[i].value.trim();
+    const r=roles[i].value;
+    if(e&&r) pairs.push({emoji:e,role_id:r});
+  }
+  if(!pairs.length){toast('이모지와 역할을 최소 1개 입력해주세요','err');return;}
   try{
-    const r=await fetch(`${API}/api/guild/${gid}/reaction-role`,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    const res=await fetch(`${API}/api/guild/${gid}/reaction-role`,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       channel_id:ch,
-      emoji:emoji,
-      role_id:role,
+      pairs:pairs,
       title:document.getElementById('rr-title').value||'역할을 선택해주세요!',
       description:document.getElementById('rr-desc').value||'',
-      color:document.getElementById('rr-color').value||'5865F2',
-      footer:document.getElementById('rr-footer').value||'이모지를 클릭하면 역할이 지급돼요!',
     })});
-    const d=await r.json();
-    d.success?toast('반응역할 생성 완료!','ok'):toast('실패: '+d.error,'err');
+    const d=await res.json();
+    d.success?toast(`반응역할 패널 생성 완료! (${pairs.length}개)`,'ok'):toast('실패: '+d.error,'err');
   }catch(e){toast('오류: '+e.message,'err');}
 }
 
