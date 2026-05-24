@@ -140,6 +140,9 @@
     }
   },
   "welcome_channels": {},
+  "welcome_messages": {},
+  "welcome_mentions": {},
+  "leave_messages": {},
   "notify_channels": {},
   "log_channels": {},
   "verify_channels": {},
@@ -149,12 +152,7 @@
     "1505931388950675458": [],
     "1504858963231899768": []
   },
-  "reaction_roles": {
-    "1475483386956218438": {},
-    "1479449674925740063": {},
-    "1505931388950675458": {},
-    "1504858963231899768": {}
-  },
+  "reaction_roles": {},
   "custom_responses": {},
   "security": {
     "1475483386956218438": {
@@ -255,7 +253,7 @@
     "무냐봇": {
       "price": 9862,
       "init_price": 10000,
-      "win_rate": 0.55,
+      "win_rate": 0.5,
       "desc": "무냐 봇 서비스"
     },
     "무냐뮤직": {
@@ -267,31 +265,31 @@
     "무냐엔터": {
       "price": 14150,
       "init_price": 12000,
-      "win_rate": 0.45,
+      "win_rate": 0.5,
       "desc": "무냐 엔터테인먼트"
     },
     "무냐테크": {
       "price": 14295,
       "init_price": 15000,
-      "win_rate": 0.4,
+      "win_rate": 0.5,
       "desc": "무냐 기술 연구소"
     },
     "무냐게임": {
       "price": 8657,
       "init_price": 7000,
-      "win_rate": 0.6,
+      "win_rate": 0.5,
       "desc": "무냐 게임즈"
     },
     "무냐푸드": {
       "price": 4763,
       "init_price": 5000,
-      "win_rate": 0.65,
+      "win_rate": 0.5,
       "desc": "무냐 푸드 체인"
     },
     "무냐뱅크": {
       "price": 23468,
       "init_price": 20000,
-      "win_rate": 0.35,
+      "win_rate": 0.5,
       "desc": "무냐 금융 그룹"
     },
     "무냐에너지": {
@@ -303,13 +301,13 @@
     "무냐미디어": {
       "price": 7633,
       "init_price": 9000,
-      "win_rate": 0.55,
+      "win_rate": 0.5,
       "desc": "무냐 미디어"
     },
     "무냐헬스": {
       "price": 10822,
       "init_price": 13000,
-      "win_rate": 0.45,
+      "win_rate": 0.5,
       "desc": "무냐 헬스케어"
     }
   },
