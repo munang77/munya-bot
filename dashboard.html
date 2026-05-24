@@ -246,9 +246,32 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div id="p-ch" class="panel">
       <div class="p-title">채널 설정</div>
       <div class="p-desc">기능별로 사용할 채널을 지정해요.</div>
-      <div class="field"><label>환영 채널</label><select class="sel" id="ch-welcome"><option value="">없음</option></select></div>
+      <div class="field"><label>입퇴장 채널</label><select class="sel" id="ch-welcome"><option value="">없음</option></select></div>
       <div class="field"><label>로그 채널</label><select class="sel" id="ch-log"><option value="">없음</option></select></div>
       <div class="field"><label>전달 채널</label><select class="sel" id="ch-notify"><option value="">없음</option></select></div>
+      <div class="hr"></div>
+      <div class="p-title" style="margin-bottom:4px;font-size:.85rem">입장 메시지</div>
+      <div class="field">
+        <label>입장 메시지 내용</label>
+        <textarea class="inp" id="welcome-msg" rows="3" placeholder="예: {user}님이 서버에 입장했어요! 환영해요 🎉" style="resize:vertical;line-height:1.6"></textarea>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:4px">{user} = 유저 멘션 / {name} = 유저 이름 / {server} = 서버 이름</div>
+      </div>
+      <div class="field">
+        <label>추가 멘션</label>
+        <select class="sel" id="welcome-mention">
+          <option value="">없음</option>
+          <option value="{user}">입장한 유저 멘션</option>
+          <option value="@here">@here</option>
+          <option value="@everyone">@everyone</option>
+        </select>
+      </div>
+      <div class="hr"></div>
+      <div class="p-title" style="margin-bottom:4px;font-size:.85rem">퇴장 메시지</div>
+      <div class="field">
+        <label>퇴장 메시지 내용</label>
+        <textarea class="inp" id="leave-msg" rows="3" placeholder="예: {name}님이 서버를 떠났어요." style="resize:vertical;line-height:1.6"></textarea>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:4px">{user} = 유저 멘션 / {name} = 유저 이름 / {server} = 서버 이름</div>
+      </div>
       <button class="save" onclick="save()">저장</button>
     </div>
 
@@ -458,6 +481,9 @@ function render(d){
   document.getElementById('tp-ch').innerHTML=to;
   document.getElementById('rr-ch').innerHTML=to;
   document.getElementById('ch-welcome').value=d.channels.welcome||'';
+  document.getElementById('welcome-msg').value=d.channels.welcome_message||'';
+  document.getElementById('welcome-mention').value=d.channels.welcome_mention||'';
+  document.getElementById('leave-msg').value=d.channels.leave_message||'';
   document.getElementById('ch-log').value=d.channels.log||'';
   document.getElementById('ch-notify').value=d.channels.notify||'';
   document.getElementById('ticket-log').value=d.ticket.log_channel_id||'';
@@ -526,7 +552,7 @@ async function save(){
     const r=await fetch(`${API}/api/guild/${gid}`,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       security:{spam:document.getElementById('sec-spam').checked,invite:document.getElementById('sec-invite').checked,mention:document.getElementById('sec-mention').checked,badword:document.getElementById('sec-badword').checked,warn_limit:parseInt(document.getElementById('sec-warn-limit').value),timeout_minutes:parseInt(document.getElementById('sec-timeout').value),badwords:gdata.security.badwords},
       ticket:{category_id:document.getElementById('ticket-cat').value,support_role_id:document.getElementById('ticket-role').value,log_channel_id:document.getElementById('ticket-log').value,welcome_message:document.getElementById('ticket-welcome').value},
-      channels:{welcome:document.getElementById('ch-welcome').value,log:document.getElementById('ch-log').value,notify:document.getElementById('ch-notify').value},
+      channels:{welcome:document.getElementById('ch-welcome').value,log:document.getElementById('ch-log').value,notify:document.getElementById('ch-notify').value,welcome_message:document.getElementById('welcome-msg').value,welcome_mention:document.getElementById('welcome-mention').value,leave_message:document.getElementById('leave-msg').value},
       chat_enabled:document.getElementById('chat-on').checked,
     })});
     const d=await r.json();
