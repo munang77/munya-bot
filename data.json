@@ -253,61 +253,61 @@
   },
   "global_stocks": {
     "무냐봇": {
-      "price": 10927,
+      "price": 9862,
       "init_price": 10000,
       "win_rate": 0.55,
       "desc": "무냐 봇 서비스"
     },
     "무냐뮤직": {
-      "price": 7443,
+      "price": 8780,
       "init_price": 8000,
       "win_rate": 0.5,
       "desc": "무냐 음악 스트리밍"
     },
     "무냐엔터": {
-      "price": 12000,
+      "price": 14150,
       "init_price": 12000,
       "win_rate": 0.45,
       "desc": "무냐 엔터테인먼트"
     },
     "무냐테크": {
-      "price": 15000,
+      "price": 14295,
       "init_price": 15000,
       "win_rate": 0.4,
       "desc": "무냐 기술 연구소"
     },
     "무냐게임": {
-      "price": 7722,
+      "price": 8657,
       "init_price": 7000,
       "win_rate": 0.6,
       "desc": "무냐 게임즈"
     },
     "무냐푸드": {
-      "price": 5000,
+      "price": 4763,
       "init_price": 5000,
       "win_rate": 0.65,
       "desc": "무냐 푸드 체인"
     },
     "무냐뱅크": {
-      "price": 20000,
+      "price": 23468,
       "init_price": 20000,
       "win_rate": 0.35,
       "desc": "무냐 금융 그룹"
     },
     "무냐에너지": {
-      "price": 11000,
+      "price": 10614,
       "init_price": 11000,
       "win_rate": 0.5,
       "desc": "무냐 에너지"
     },
     "무냐미디어": {
-      "price": 9000,
+      "price": 7633,
       "init_price": 9000,
       "win_rate": 0.55,
       "desc": "무냐 미디어"
     },
     "무냐헬스": {
-      "price": 13000,
+      "price": 10822,
       "init_price": 13000,
       "win_rate": 0.45,
       "desc": "무냐 헬스케어"
