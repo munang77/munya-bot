@@ -277,6 +277,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="set-item" onclick="go('p-ch',this)">채널</div>
       <div class="set-item" onclick="go('p-ticket',this)">티켓</div>
       <div class="set-item" onclick="go('p-rr',this)">반응역할</div>
+      <div class="set-item" onclick="go('p-autorole',this)">자동역할</div>
+      <div class="set-item" onclick="go('p-level',this)">레벨 시스템</div>
       <div class="set-item" onclick="go('p-bw',this)">금지어</div>
       <div class="set-item" onclick="go('p-chat',this)">채팅봇</div>
     </div>
@@ -419,6 +421,68 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         </div>
       </div>
       <button class="btn bp" style="margin-top:8px" onclick="sendReactionRole()">패널 생성하기</button>
+    </div>
+
+    <!-- 자동역할 -->
+    <div id="p-autorole" class="panel" style="display:none">
+      <div class="p-title">자동역할 설정</div>
+      <div class="p-desc">서버에 입장할 때 자동으로 지급할 역할을 설정해요.</div>
+      <div class="field"><label>자동 지급 역할</label><select class="sel" id="auto-role"><option value="">없음 (해제)</option></select></div>
+      <button class="save" onclick="saveAutoRole()">저장</button>
+    </div>
+
+    <!-- 레벨 시스템 -->
+    <div id="p-level" class="panel" style="display:none">
+      <div class="p-title">레벨 시스템</div>
+      <div class="p-desc">채팅할수록 XP를 얻고 레벨업하는 시스템이에요.</div>
+
+      <div class="field" style="display:flex;align-items:center;gap:12px">
+        <label style="margin:0">레벨 시스템</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="lv-enabled" style="width:18px;height:18px;accent-color:var(--accent)">
+          <span id="lv-enabled-label" style="font-size:.82rem;color:var(--sub)">꺼짐</span>
+        </label>
+      </div>
+      <div class="hr"></div>
+
+      <div class="p-title" style="font-size:.85rem;margin-bottom:8px">XP 설정</div>
+      <div class="f2">
+        <div class="field"><label>메시지당 최소 XP</label><input type="number" class="inp" id="lv-xp-min" value="10" min="1" max="999"></div>
+        <div class="field"><label>메시지당 최대 XP</label><input type="number" class="inp" id="lv-xp-max" value="25" min="1" max="999"></div>
+      </div>
+      <div class="field"><label>XP 쿨타임 (초)</label><input type="number" class="inp" id="lv-cooldown" value="60" min="0" max="3600">
+        <div style="font-size:.72rem;color:var(--muted);margin-top:4px">같은 유저가 XP를 얻을 수 있는 최소 간격이에요.</div>
+      </div>
+      <div class="hr"></div>
+
+      <div class="p-title" style="font-size:.85rem;margin-bottom:8px">레벨업 알림</div>
+      <div class="field"><label>레벨업 채널</label><select class="sel" id="lv-ch"><option value="">채팅 채널 (기본)</option></select></div>
+      <div class="field"><label>레벨업 메시지</label>
+        <input type="text" class="inp" id="lv-msg" value="{user}님이 레벨 {level} 달성!">
+        <div style="font-size:.72rem;color:var(--muted);margin-top:4px">{user}=멘션 / {level}=레벨 / {name}=닉네임</div>
+      </div>
+      <div class="hr"></div>
+
+      <div class="p-title" style="font-size:.85rem;margin-bottom:8px">역할 보상</div>
+      <div class="f2">
+        <div class="field"><label>레벨</label><input type="number" class="inp" id="lv-rr-level" placeholder="예: 10" min="1"></div>
+        <div class="field"><label>지급 역할</label><select class="sel" id="lv-rr-role"><option value="">역할 선택</option></select></div>
+      </div>
+      <div class="field" style="display:flex;align-items:center;gap:12px">
+        <label style="margin:0">역할 방식</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="lv-stack" checked style="width:18px;height:18px;accent-color:var(--accent)">
+          <span style="font-size:.82rem;color:var(--sub)">누적 (체크=누적, 미체크=교체)</span>
+        </label>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn bp" onclick="addLevelRole()">역할 보상 추가</button>
+        <button class="btn" style="background:var(--card);border:1px solid var(--border)" onclick="removeLevelRole()">역할 보상 삭제</button>
+      </div>
+
+      <div id="lv-rr-list" style="margin-top:12px;display:flex;flex-direction:column;gap:6px"></div>
+      <div class="hr"></div>
+      <button class="save" onclick="saveLevelSettings()">저장</button>
     </div>
 
     <!-- 금지어 -->
@@ -582,6 +646,13 @@ function render(d){
   document.getElementById('ticket-role').value=d.ticket.support_role_id||'';
   const rrRoleOpts='<option value="">역할 선택</option>'+d.roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
   document.querySelectorAll('.rr-role').forEach(sel=>sel.innerHTML=rrRoleOpts);
+  // 자동역할
+  document.getElementById('auto-role').innerHTML='<option value="">없음 (해제)</option>'+d.roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  if(d.auto_role) document.getElementById('auto-role').value=d.auto_role;
+  // 레벨 채널
+  document.getElementById('lv-ch').innerHTML='<option value="">채팅 채널 (기본)</option>'+d.channels_list.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  // 레벨 설정 로드
+  if(d.level) loadLevelSettings(d.level, d.roles);
 
   renderBw(d.security.badwords||[]);
   renderWarn(d.warns||{});
@@ -681,6 +752,75 @@ async function sendReactionRole(){
 function login(){location.href=`${API}/auth/login`;}
 async function logout(){await fetch(`${API}/api/logout`,{method:'POST',credentials:'include'});location.reload();}
 function toast(m,t='ok'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.classList.remove('show'),3000);}
+
+// ── 자동역할 저장 ─────────────────────────────────
+async function saveAutoRole(){
+  const role=document.getElementById('auto-role').value;
+  const r=await fetch(`${API}/api/guild/${gid}/settings`,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({auto_role: role||null})});
+  const d=await r.json();
+  d.success?toast('자동역할 저장 완료!','ok'):toast('실패','err');
+}
+
+// ── 레벨 시스템 ──────────────────────────────────
+let levelRoleRewards = {};
+
+function renderLevelRoles(roles){
+  const el=document.getElementById('lv-rr-list');
+  el.innerHTML='';
+  Object.entries(levelRoleRewards).sort((a,b)=>parseInt(a[0])-parseInt(b[0])).forEach(([lv,rid])=>{
+    const role=roles.find(r=>r.id===String(rid));
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;';
+    div.innerHTML=`<span>Lv.<b>${lv}</b> → ${role?role.name:rid}</span><button onclick="deleteLvRole('${lv}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem">삭제</button>`;
+    el.appendChild(div);
+  });
+}
+function deleteLvRole(lv){ delete levelRoleRewards[lv]; renderLevelRoles(window._roles||[]); }
+function addLevelRole(){
+  const lv=document.getElementById('lv-rr-level').value;
+  const rid=document.getElementById('lv-rr-role').value;
+  if(!lv||!rid){toast('레벨과 역할을 선택해주세요','err');return;}
+  levelRoleRewards[String(parseInt(lv))]=rid;
+  renderLevelRoles(window._roles||[]);
+  document.getElementById('lv-rr-level').value='';
+}
+function removeLevelRole(){
+  const lv=document.getElementById('lv-rr-level').value;
+  if(!lv){toast('삭제할 레벨을 입력해주세요','err');return;}
+  deleteLvRole(String(parseInt(lv)));
+}
+async function saveLevelSettings(){
+  const data={
+    enabled:document.getElementById('lv-enabled').checked,
+    xp_min:parseInt(document.getElementById('lv-xp-min').value)||10,
+    xp_max:parseInt(document.getElementById('lv-xp-max').value)||25,
+    cooldown:parseInt(document.getElementById('lv-cooldown').value)||60,
+    level_up_channel:document.getElementById('lv-ch').value||null,
+    level_up_msg:document.getElementById('lv-msg').value,
+    role_rewards:levelRoleRewards,
+    stack_roles:document.getElementById('lv-stack').checked,
+  };
+  const r=await fetch(`${API}/api/guild/${gid}/level-settings`,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const d=await r.json();
+  d.success?toast('레벨 설정 저장 완료!','ok'):toast('실패: '+d.error,'err');
+}
+function loadLevelSettings(d, roles){
+  window._roles=roles;
+  document.getElementById('lv-enabled').checked=d.enabled||false;
+  document.getElementById('lv-enabled-label').textContent=d.enabled?'켜짐':'꺼짐';
+  document.getElementById('lv-enabled').onchange=e=>{document.getElementById('lv-enabled-label').textContent=e.target.checked?'켜짐':'꺼짐';};
+  document.getElementById('lv-xp-min').value=d.xp_min||10;
+  document.getElementById('lv-xp-max').value=d.xp_max||25;
+  document.getElementById('lv-cooldown').value=d.cooldown||60;
+  document.getElementById('lv-ch').value=d.level_up_channel||'';
+  document.getElementById('lv-msg').value=d.level_up_msg||'{user}님이 레벨 {level} 달성!';
+  document.getElementById('lv-stack').checked=d.stack_roles!==false;
+  levelRoleRewards={...d.role_rewards||{}};
+  renderLevelRoles(roles);
+  const rrOpts='<option value="">역할 선택</option>'+roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  document.getElementById('lv-rr-role').innerHTML=rrOpts;
+}
+
 
 // ── 모바일 서버 선택 ──────────────────────────────
 function openMobileSrv(){
