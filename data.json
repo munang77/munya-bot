@@ -291,7 +291,7 @@
     },
     "1479449674925740063": {
       "spam": true,
-      "invite": true,
+      "invite": false,
       "mention": true,
       "badword": true,
       "spam_count": 5,
@@ -342,7 +342,8 @@
         "last_date": "2026-05-25",
         "streak": 1
       }
-    }
+    },
+    "1479449674925740063": {}
   },
   "start_time": "2026-05-22T12:29:35.103426+00:00",
   "stat_channels": {},
